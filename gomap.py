@@ -119,22 +119,22 @@ def common_draw_color(self):
 									count_black1+=1
 								elif self.links[p2l(i,j,ii,jj,dim)]==2: #white colored link
 									count_white1+=1
-								if count_black1>0 and count_white1==0: #that first point has only black links
-									for uu,vv in goban.neighborhood(u,v,dim): #how many colored links has the second point?
-										if self.links[p2l(u,v,uu,vv,dim)]==1: #black colored link
-											count_black2+=1
-										elif self.links[p2l(u,v,uu,vv,dim)]==2: #white colored link
-											count_white2+=1
-										if count_black2>0 and count_white2==0: #that second point has only black links as well
-											links[p2l(i,j,u,v,dim)]=1 #so link should be colored in black
-								elif count_black1==0 and count_white1>0: #that first point has only white links
-									for uu,vv in goban.neighborhood(u,v,dim):  #how many colored links has the second point?
-										if self.links[p2l(u,v,uu,vv,dim)]==1: #black colored link
-											count_black2+=1
-										elif self.links[p2l(u,v,uu,vv,dim)]==2: #white colored link
-											count_white2+=1
-									if count_black2==0 and count_white2>0: #that second point has only white links as well
-										links[p2l(i,j,u,v,dim)]=2 #so link should be colored in white
+							if count_black1>0 and count_white1==0: #that first point has only black links
+								for uu,vv in goban.neighborhood(u,v,dim): #how many colored links has the second point?
+									if self.links[p2l(u,v,uu,vv,dim)]==1: #black colored link
+										count_black2+=1
+									elif self.links[p2l(u,v,uu,vv,dim)]==2: #white colored link
+										count_white2+=1
+								if count_black2>0 and count_white2==0: #that second point has only black links as well
+									links[p2l(i,j,u,v,dim)]=1 #so link should be colored in black
+							elif count_black1==0 and count_white1>0: #that first point has only white links
+								for uu,vv in goban.neighborhood(u,v,dim):  #how many colored links has the second point?
+									if self.links[p2l(u,v,uu,vv,dim)]==1: #black colored link
+										count_black2+=1
+									elif self.links[p2l(u,v,uu,vv,dim)]==2: #white colored link
+										count_white2+=1
+								if count_black2==0 and count_white2>0: #that second point has only white links as well
+									links[p2l(i,j,u,v,dim)]=2 #so link should be colored in white
 	self.network=new_network
 	self.links=links
 	self.goban.display(self.grid,self.markup,self.network,self.links)
