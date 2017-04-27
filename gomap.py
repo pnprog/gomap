@@ -333,7 +333,6 @@ class OpenMove():
 			row, col = move0
 			if colour=='b':
 				place(grid3,row,col,1)
-
 			else:
 				place(grid3,row,col,2)
 
@@ -498,6 +497,8 @@ class DualView(Frame):
 			row, col = move0
 			if colour=='b':
 				place(grid,row,col,1)
+			else:
+				place(grid,row,col,2)
 
 		
 		m=0
