@@ -32,7 +32,7 @@ def common_draw_color(self):
 	#looking for new color controled points
 	for i in range(dim):
 		for j in range(dim):
-			if self.network[i][j] in [0] and self.grid[i][j]==0: #empty point (not a stone)
+			if self.network[i][j] in [0] and self.grid[i][j] in [0,-1,-2]: #empty point (not a stone)
 				neighbors=goban.neighborhood(i,j,dim)
 				count=0
 				for u,v in neighbors:
@@ -257,11 +257,13 @@ class OpenMove():
 			#inside the grid
 			#what is under the pointer ?
 			
-			if self.grid[i][j] not in (1,2):
+			if self.grid[i][j] not in (-1,-2,1,2):
 				#nothing, so we add a black stone			
 				
-
-				
+				for ii in range(dim):
+					for jj in range(dim):
+						self.grid[ii][jj]=abs(self.grid[ii][jj])
+						
 				self.history.append([copy(self.grid),copy(self.markup)])
 					
 				place(self.grid,i,j,color)
@@ -275,6 +277,20 @@ class OpenMove():
 				self.goban.display(self.grid,self.markup,self.network,self.links)
 				self.next_color=3-color
 				self.frame=0
+			elif self.grid[i][j] in (1,2):
+				#there is a stone, so we mark it (and it's group) as dead
+				print "dead group"
+				mark_dead_group(self.grid,i,j)
+				self.links=[0]*2*dim*dim
+				self.network=[[0 for row in range(dim)] for col in range(dim)]
+				self.goban.display(self.grid,self.markup,self.network,self.links)
+			elif self.grid[i][j] in (-1,-2):
+				#there is a (dead) stone, so we mark it (and it's group) as (un)dead
+				print "undead group"
+				mark_dead_group(self.grid,i,j)
+				self.links=[0]*2*dim*dim
+				self.network=[[0 for row in range(dim)] for col in range(dim)]
+				self.goban.display(self.grid,self.markup,self.network,self.links)
 
 	def color_map(self):
 		self.calculate_color(self)
@@ -616,6 +632,34 @@ class DualView(Frame):
 		self.goban.space=self.goban_size/(self.dim+1+1)
 
 		Label(self,text='   ',background=bg).grid(column=4,row=row+1)
+		
+		self.goban.bind("<Button-1>",self.click)
+
+
+	def click(self,event):
+		dim=self.dim
+		print "dim:::",dim
+		#add/remove black stone
+		#check pointer location
+		i,j=self.goban.xy2ij(event.x,event.y)
+		if 0 <= i <= dim-1 and 0 <= j <= dim-1:
+			#inside the grid
+			#what is under the pointer ?
+			
+			if self.grid[i][j] in (1,2):
+				#there is a stone, so we mark it (and it's group) as dead
+				print "dead group"
+				mark_dead_group(self.grid,i,j)
+				self.links=[0]*2*dim*dim
+				self.network=[[0 for row in range(dim)] for col in range(dim)]
+				self.goban.display(self.grid,self.markup,self.network,self.links)
+			elif self.grid[i][j] in (-1,-2):
+				#there is a (dead) stone, so we mark it (and it's group) as (un)dead
+				print "undead group"
+				mark_dead_group(self.grid,i,j)
+				self.links=[0]*2*dim*dim
+				self.network=[[0 for row in range(dim)] for col in range(dim)]
+				self.goban.display(self.grid,self.markup,self.network,self.links)
 
 
 	def save_as_ps(self):

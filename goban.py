@@ -84,6 +84,19 @@ class Goban(Canvas):
 		
 		self.draw_rectangle(-0.1-.5,-0.1-.5,dim-1+.5+0.1,dim-1+.5+0.1,black)
 		self.draw_rectangle(0-.5,0-.5,dim-1+.5,dim-1+.5,bg)
+
+		for i in range(dim):
+			for j in range(dim):
+				markup_color='black'
+				u=i+self.mesh[i][j][0]
+				v=j+self.mesh[i][j][1]
+				if grid[i][j]==-1:
+					#black
+					self.draw_point(u,v,.95,"#6A592C")
+					markup_color='white'
+				if grid[i][j]==-2:
+					self.draw_point(u,v,.95,"#EAD9AC")
+		
 		for i in range(dim):
 			self.draw_line(i,0,i,dim-1,color=black)
 			self.draw_line(0,i,dim-1,i,color=black)
@@ -100,6 +113,9 @@ class Goban(Canvas):
 		if dim==19:
 			for i,j in [[3,3],[3,9],[9,9],[3,15],[15,15],[15,9],[9,15],[15,3],[9,3]]:
 				self.draw_point(i,j,0.3,black)
+
+		
+
 
 		for i in range(dim):
 			for j in range(dim):
@@ -130,6 +146,7 @@ class Goban(Canvas):
 					markup_color='white'
 				if grid[i][j]==2:
 					self.draw_point(u,v,.95,"white")
+
 				
 				if type(markup[i][j]) is int:
 					if markup[i][j]==0:
@@ -191,6 +208,16 @@ def countlib(grid,i,j,lib=0,tab=None):
 		return lib
 	else:
 		return lib,tab
+
+def mark_dead_group(grid,i,j):
+	color=grid[i][j]
+	grid[i][j]=-1*grid[i][j]
+	dim=len(grid)
+	for x,y in neighborhood(i,j,dim):
+		if grid[x][y]==color:
+			 mark_dead_group(grid,x,y)
+
+
 
 def remove_group(grid,i,j):
 	color=grid[i][j]
