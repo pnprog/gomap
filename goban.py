@@ -121,18 +121,29 @@ class Goban(Canvas):
 			for j in range(dim):
 				neighbors=neighborhood(i,j,dim)
 				
+				"""
 				if network[i][j]==1:
-					self.draw_point(i,j,0.5,"#8A80D8",outline="#8A80D8")
+					self.draw_point(i,j,0.2,"#8A80D8",outline="#8A80D8")
 				
 				if network[i][j]==2:
-					self.draw_point(i,j,0.5,"#FFF88E",outline="#FFF88E")
+					self.draw_point(i,j,0.2,"#FFF88E",outline="#FFF88E")
+				"""
+				
+				if network[i][j]==3:
+					self.draw_point(i,j,0.2,"#8A80D8",outline="#8A80D8")
+				
+				if network[i][j]==4:
+					self.draw_point(i,j,0.2,"#FFF88E",outline="#FFF88E")
 				
 				for u,v in neighbors:
 					if links[p2l(i,j,u,v,dim)]==1:
 						self.draw_line(i,j,u,v,color="#8A80D8",width=3)
 					elif links[p2l(i,j,u,v,dim)]==2:
 						self.draw_line(i,j,u,v,color="#FFF88E",width=3)
-					
+					elif links[p2l(i,j,u,v,dim)]==3:
+						self.draw_point(0.5*(i+u),0.5*(j+v),0.2,"#8A80D8",outline="#8A80D8")
+					elif links[p2l(i,j,u,v,dim)]==4:
+						self.draw_point(0.5*(i+u),0.5*(j+v),0.2,"#FFF88E",outline="#FFF88E")
 
 		for i in range(dim):
 			for j in range(dim):

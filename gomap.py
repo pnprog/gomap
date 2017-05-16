@@ -141,6 +141,94 @@ def common_draw_color(self):
 	
 
 
+def common_draw_shadow(self):
+	dim=self.dim
+
+	network=self.network
+	links=self.links
+	
+	#Each singly-coloured point shadows its links to empty points
+	for i in range(dim):
+		for j in range(dim):
+			if self.network[i][j]==0: #this is an empty point (singly colored point must be empty)
+				neighbors=goban.neighborhood(i,j,dim)
+				count_black=0
+				count_white=0
+				count_grey=0
+				for u,v in neighbors:
+					if links[p2l(i,j,u,v,dim)]==1:
+						count_black+=1
+					elif links[p2l(i,j,u,v,dim)]==2:
+						count_white+=1
+					elif links[p2l(i,j,u,v,dim)]==1.5:
+						count_grey+=1	
+				if count_black>0 and count_white==0 and count_grey==0:
+					#this is a singly colored black point
+					for u,v in neighbors:
+						if self.network[u][v]<=0:
+							if links[p2l(i,j,u,v,dim)] in [0,3]:
+								links[p2l(i,j,u,v,dim)]=3
+							elif links[p2l(i,j,u,v,dim)]==4:
+								links[p2l(i,j,u,v,dim)]=3.5
+							
+				elif count_black==0 and count_white>0 and count_grey==0:
+					#this is a singly colored white point
+					for u,v in neighbors:
+						if self.network[u][v]<=0:
+							if links[p2l(i,j,u,v,dim)] in [0,4]:
+								links[p2l(i,j,u,v,dim)]=4
+							elif links[p2l(i,j,u,v,dim)]==3:
+								links[p2l(i,j,u,v,dim)]=3.5
+	
+	
+	#a point whose links are multiply shadowed by only one colour becomes a shadowed point.
+	for i in range(dim):
+		for j in range(dim):
+			if self.network[i][j]==0: #this is an empty point (singly shadowed point must be empty)
+				neighbors=goban.neighborhood(i,j,dim)
+				count_black=0
+				count_white=0
+				count_other=0
+				for u,v in neighbors:
+					if links[p2l(i,j,u,v,dim)] in [1,3]:
+						count_black+=1
+					elif links[p2l(i,j,u,v,dim)] in [2,4]:
+						count_white+=1
+					elif links[p2l(i,j,u,v,dim)] in [1.5,3.5]:
+						count_other+=1
+					
+				if count_black>1 and count_white==0 and count_other==0:
+					#this is a singly shadowed black point
+					self.network[i][j]=3
+					
+				elif count_black==0 and count_white>1 and count_other==0:
+					#this is a singly shadowed white point
+					self.network[i][j]=4
+	
+	#a shadowed point propagates its shadow along its unshadowed links.
+	for i in range(dim):
+		for j in range(dim):
+			if self.network[i][j]==3:
+				neighbors=goban.neighborhood(i,j,dim)
+				for u,v in neighbors:
+					if links[p2l(i,j,u,v,dim)] in [0,3]:
+						links[p2l(i,j,u,v,dim)]=3
+					elif links[p2l(i,j,u,v,dim)]==4:
+						links[p2l(i,j,u,v,dim)]=3.5
+						
+			elif self.network[i][j]==4:
+				neighbors=goban.neighborhood(i,j,dim)
+				for u,v in neighbors:
+					if links[p2l(i,j,u,v,dim)] in [0,4]:
+						links[p2l(i,j,u,v,dim)]=4
+					elif links[p2l(i,j,u,v,dim)]==3:
+						links[p2l(i,j,u,v,dim)]=3.5
+			
+	self.goban.display(self.grid,self.markup,self.network,self.links)
+
+	
+	
+	
 
 from goban import *
 
@@ -296,6 +384,10 @@ class OpenMove():
 		self.calculate_color(self)
 		self.frame+=1
 		
+	def shadow_map(self):
+		common_draw_shadow(self)
+		self.frame+=1
+	
 	def initialize(self):
 		
 		self
@@ -319,8 +411,7 @@ class OpenMove():
 		#Button(panel, text='undo',command=lambda :click_on_undo(self)).grid(column=0,row=1)
 		Button(panel, text='undo',command=self.undo).grid(column=0,row=1)
 		Button(panel, text=' Color ',command=self.color_map).grid(column=0,row=2)
-		#Button(panel, text='Cluster').grid(column=0,row=3)
-		#Button(panel, text='Shadow ').grid(column=0,row=4)
+		Button(panel, text='Shadow ',command=self.shadow_map).grid(column=0,row=4)
 		Button(panel, text='Export',command=self.save_as_ps).grid(column=0,row=5)
 		
 		panel.grid(column=0,row=1,sticky=N)
@@ -448,6 +539,10 @@ class DualView(Frame):
 		
 	def color_map(self):
 		common_draw_color(self)
+		self.frame+=1
+		
+	def shadow_map(self):
+		common_draw_shadow(self)
 		self.frame+=1
 		
 	def close_app(self):
@@ -610,8 +705,7 @@ class DualView(Frame):
 		self.move_number.grid(column=20,row=3)
 		
 		Button(buttons_bar, text=' Color ',command=self.color_map).grid(column=19,row=4)
-		#Button(buttons_bar, text='Cluster').grid(column=20,row=4)
-		#Button(buttons_bar, text='Shadow ').grid(column=21,row=4)
+		Button(buttons_bar, text='Shadow ',command=self.shadow_map).grid(column=20,row=4)
 		
 		Button(buttons_bar, text='Export',command=self.save_as_ps).grid(column=21,row=4)
 		
