@@ -678,7 +678,7 @@ class DualView(Frame):
 		self.gameroot=self.sgf.get_root()
 		
 
-		self.parent.title('GoReviewPartner')
+		self.parent.title('GoMap')
 		self.parent.protocol("WM_DELETE_WINDOW", self.close_app)
 		
 		
